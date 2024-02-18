@@ -1,12 +1,12 @@
 package fr.istic.taa.jaxrs.domain;
 
 import jakarta.persistence.*;
+import jakarta.xml.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Entity
+@XmlRootElement(name = "Ticket")
 public class Ticket {
     @Id
     @GeneratedValue
@@ -37,6 +37,7 @@ public class Ticket {
         this.id = id;
     }
 
+    @XmlElement(name = "title")
     public String getTitle() {
         return title;
     }
@@ -45,6 +46,7 @@ public class Ticket {
         this.title = title;
     }
 
+    @XmlElement(name = "description")
     public String getDescription() {
         return description;
     }
@@ -77,6 +79,7 @@ public class Ticket {
         this.createdBy = createdBy;
     }
 
+    @XmlElement(name = "assignedTo")
     public User getAssignedTo() {
         return assignedTo;
     }
@@ -85,6 +88,7 @@ public class Ticket {
         this.assignedTo = assignedTo;
     }
 
+    @XmlElement(name = "tags")
     public List<Tag> getTags() {
         return tags;
     }
@@ -93,6 +97,7 @@ public class Ticket {
         this.tags = tags;
     }
 
+    @XmlElement(name = "comments")
     public List<Comment> getComments() {
         return comments;
     }

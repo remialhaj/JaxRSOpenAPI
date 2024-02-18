@@ -1,14 +1,12 @@
 package fr.istic.taa.jaxrs.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.persistence.*;
+import jakarta.xml.bind.annotation.*;
+import java.util.*;
 
 @Entity
 @Table(name = "USER")
+@XmlRootElement(name = "User")
 public class User {
     @Id
     @GeneratedValue
@@ -17,7 +15,9 @@ public class User {
     private String username;
     private String email;
     private String password;
-
+    @OneToMany(mappedBy = "createdBy", cascade = CascadeType.ALL)
+    private List<Ticket> tickets = new ArrayList<>();
+    @XmlElement(name = "id")
     public Long getId() {
         return id;
     }
@@ -26,6 +26,7 @@ public class User {
         this.id = id;
     }
 
+    @XmlElement(name = "username")
     public String getUsername() {
         return username;
     }
@@ -34,6 +35,7 @@ public class User {
         this.username = username;
     }
 
+    @XmlElement(name = "email")
     public String getEmail() {
         return email;
     }
@@ -42,11 +44,20 @@ public class User {
         this.email = email;
     }
 
+    @XmlElement(name = "password")
     public String getPassword() {
         return password;
     }
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public List<Ticket> getTickets() {
+        return tickets;
+    }
+
+    public void setTickets(List<Ticket> tickets) {
+        this.tickets = tickets;
     }
 }

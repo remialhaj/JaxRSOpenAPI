@@ -1,9 +1,10 @@
 package fr.istic.taa.jaxrs.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+import jakarta.xml.bind.annotation.*;
+
 @Entity
+@XmlRootElement(name = "Tag")
 public class Tag {
     @Id
     @GeneratedValue
@@ -19,6 +20,7 @@ public class Tag {
         this.id = id;
     }
 
+    @XmlElement(name = "name")
     public String getName() {
         return name;
     }

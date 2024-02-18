@@ -1,12 +1,11 @@
 package fr.istic.taa.jaxrs.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
+import jakarta.xml.bind.annotation.*;
 
 import java.util.Date;
 @Entity
+@XmlRootElement(name = "Comment")
 public class Comment {
     @Id
     @GeneratedValue
@@ -29,6 +28,7 @@ public class Comment {
         this.id = id;
     }
 
+    @XmlElement(name = "createdBy")
     public User getCreatedBy() {
         return createdBy;
     }
@@ -45,6 +45,7 @@ public class Comment {
         this.ticket = ticket;
     }
 
+    @XmlElement(name = "content")
     public String getContent() {
         return content;
     }

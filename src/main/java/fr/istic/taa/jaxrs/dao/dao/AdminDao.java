@@ -1,11 +1,8 @@
 package fr.istic.taa.jaxrs.dao.dao;
 
-import fr.istic.taa.jaxrs.dao.generic.AbstractJpaDao;
-import fr.istic.taa.jaxrs.dao.generic.EntityManagerHelper;
+import fr.istic.taa.jaxrs.dao.generic.*;
 import fr.istic.taa.jaxrs.domain.Admin;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityTransaction;
-import jakarta.persistence.Query;
+import jakarta.persistence.*;
 
 import java.util.List;
 

@@ -1,20 +1,18 @@
 package fr.istic.taa.jaxrs.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.persistence.*;
+import jakarta.xml.bind.annotation.*;
 
 @Entity
 @Table(name = "Pet")
+@XmlRootElement(name = "Pet")
 public class Pet {
   @Id
   @GeneratedValue
   private long id;
   private String name;
 
+  @XmlElement(name = "id")
   public long getId() {
     return id;
   }
@@ -23,6 +21,7 @@ public class Pet {
     this.id = id;
   }
 
+  @XmlElement(name = "name")
   public String getName() {
     return name;
   }

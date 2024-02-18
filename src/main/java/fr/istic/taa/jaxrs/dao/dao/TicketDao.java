@@ -1,11 +1,8 @@
 package fr.istic.taa.jaxrs.dao.dao;
 
-import fr.istic.taa.jaxrs.dao.generic.AbstractJpaDao;
-import fr.istic.taa.jaxrs.dao.generic.EntityManagerHelper;
+import fr.istic.taa.jaxrs.dao.generic.*;
 import fr.istic.taa.jaxrs.domain.Ticket;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityTransaction;
-import jakarta.persistence.Query;
+import jakarta.persistence.*;
 
 import java.util.List;
 
@@ -94,4 +91,12 @@ public class TicketDao extends AbstractJpaDao<Ticket, String> {
         Query query = entityManager.createQuery("SELECT p FROM Ticket p", Ticket.class);
         return query.getResultList();
     }
+
+    public List<Ticket> findTicketsCreatedByUser(Long userId) {
+        Query query = entityManager.createQuery("SELECT t FROM Ticket t WHERE t.createdBy.id = :userId", Ticket.class);
+        query.setParameter("userId", userId);
+        return query.getResultList();
+    }
+
+
 }
