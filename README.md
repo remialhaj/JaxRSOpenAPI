@@ -1,3 +1,15 @@
+TP5
+Partie 2:
+Ajout des classes DAO et classe domain
+Création de la UserResource et SwaggerResource
+Ajout dépandance dans le pom.xml swagger
+Dossier swagger ajouté dans webapp
+ajout des @XmlRootElement pour les entités pour afficher en xml
+ajout des @XmlTransient pour les entités pour ne pas afficher en xml
+
+Ajout des GET, POST, PUT, DELETE pour les entités, PATH, CONSUMES
+
+
 USER:
 CHANGERID : mettre l'id générer voir dans la base de donnée
 curl -X POST -H "Content-Type: application/json" -d '{"username":"JohnDoe","email":"john.doe@example.com","password":"password123"}' http://localhost:8080/user/
