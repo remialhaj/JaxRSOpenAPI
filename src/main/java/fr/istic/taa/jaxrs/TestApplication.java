@@ -19,6 +19,7 @@ package fr.istic.taa.jaxrs;
 import java.util.HashSet;
 import java.util.Set;
 
+import fr.istic.taa.jaxrs.rest.AdminRessource;
 import fr.istic.taa.jaxrs.rest.PetResource;
 import fr.istic.taa.jaxrs.rest.SwaggerResource;
 import fr.istic.taa.jaxrs.rest.UserResource;
@@ -42,6 +43,8 @@ public class TestApplication extends Application {
         resources.add(PetResource.class);
         resources.add(SwaggerResource.class);
         resources.add(UserResource.class);
+        resources.add(AdminRessource.class);
+        resources.add(CorsFilter.class);
 
         return resources;
     }

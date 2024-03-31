@@ -84,6 +84,13 @@
 			<version>2.2.15</version>
 		</dependency>
 
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>2.13.0</version> <!-- Mettez à jour la version selon vos besoins -->
+		</dependency>
+
+
 	</dependencies>
 	<build>
 		<defaultGoal>install</defaultGoal>
