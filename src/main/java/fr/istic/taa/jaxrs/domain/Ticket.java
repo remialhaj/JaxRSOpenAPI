@@ -6,6 +6,9 @@ import jakarta.xml.bind.annotation.*;
 import java.util.*;
 
 @Entity
+@Table(name = "TICKET", uniqueConstraints = {
+        @UniqueConstraint(columnNames = "title")
+})
 @XmlRootElement(name = "Ticket")
 public class Ticket {
     @Id
@@ -15,12 +18,14 @@ public class Ticket {
     private String title;
     private String description;
     private Date createdDate;
-    private Date resolvedDate;
+    private Boolean resolve;
 
     @ManyToOne
+    @JoinColumn(name = "created_by_id")
     private User createdBy;
 
     @ManyToOne
+    @JoinColumn(name = "assigned_to_id")
     private User assignedTo;
 
     @ManyToMany
@@ -63,12 +68,12 @@ public class Ticket {
         this.createdDate = createdDate;
     }
 
-    public Date getResolvedDate() {
-        return resolvedDate;
+    public Boolean getResolved() {
+        return resolve;
     }
 
-    public void setResolvedDate(Date resolvedDate) {
-        this.resolvedDate = resolvedDate;
+    public void setResolved(Boolean resolvedDate) {
+        this.resolve = resolvedDate;
     }
 
     public User getCreatedBy() {

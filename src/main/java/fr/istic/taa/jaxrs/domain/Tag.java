@@ -5,6 +5,9 @@ import jakarta.xml.bind.annotation.*;
 
 @Entity
 @XmlRootElement(name = "Tag")
+@Table(name = "TAG", uniqueConstraints = {
+        @UniqueConstraint(columnNames = "name")
+})
 public class Tag {
     @Id
     @GeneratedValue

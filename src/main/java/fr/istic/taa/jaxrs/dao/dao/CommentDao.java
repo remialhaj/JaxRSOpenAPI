@@ -91,4 +91,10 @@ public class CommentDao extends AbstractJpaDao<Comment, String> {
         Query query = entityManager.createQuery("SELECT p FROM Comment p", Comment.class);
         return query.getResultList();
     }
+
+    public List<Comment> findByTicketId(Long ticketId) {
+        Query query = entityManager.createQuery("SELECT p FROM Comment p WHERE p.ticket.id = :ticketId", Comment.class);
+        query.setParameter("ticketId", ticketId);
+        return query.getResultList();
+    }
 }

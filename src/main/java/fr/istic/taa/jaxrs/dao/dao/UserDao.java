@@ -1,6 +1,8 @@
 package fr.istic.taa.jaxrs.dao.dao;
 
 import fr.istic.taa.jaxrs.dao.generic.*;
+import fr.istic.taa.jaxrs.domain.Comment;
+import fr.istic.taa.jaxrs.domain.Ticket;
 import fr.istic.taa.jaxrs.domain.User;
 import jakarta.persistence.*;
 
@@ -47,7 +49,26 @@ public class UserDao extends AbstractJpaDao<User, String> {
         tx.begin(); // Début de la transaction
 
         try {
-            entityManager.remove(entityManager.contains(entity) ? entity : entityManager.merge(entity));
+            // Récupérer tous les commentaires associés à l'utilisateur
+            List<Comment> comments = findCommentsByUser(entity);
+            for (Comment comment : comments) {
+                entityManager.remove(comment);
+            }
+            // Récupérer tous les tickets associés à l'utilisateur
+            List<Ticket> tickets = findTicketsByUser(entity);
+            for (Ticket ticket : tickets) {
+                entityManager.remove(ticket);
+            }
+
+            try {
+                entityManager.remove(entityManager.contains(entity) ? entity : entityManager.merge(entity));
+            } catch (PersistenceException e) {
+                // Handle constraint violation
+                // Log the error, notify the user, or take other appropriate actions
+                // For example:
+                System.err.println("Could not delete user due to associated comments.");
+            }
+
             tx.commit(); // Validation de la transaction
         } catch (Exception e) {
             if (tx != null && tx.isActive()) {
@@ -57,33 +78,43 @@ public class UserDao extends AbstractJpaDao<User, String> {
         }
     }
 
-    @Override
-    public void deleteById(String entityId) {
-        EntityTransaction tx = entityManager.getTransaction();
-        tx.begin(); // Début de la transaction
-
-        try {
-            User UserToDelete = entityManager.find(User.class, entityId);
-            if (UserToDelete != null) {
-                entityManager.remove(UserToDelete);
-                tx.commit(); // Validation de la transaction
-            } else {
-                // Gérer le cas où l'entité avec l'ID donné n'existe pas
-                // Vous pouvez lever une exception ou effectuer un traitement approprié
-                // Dans cet exemple, je lève une IllegalArgumentException
-                throw new IllegalArgumentException("User with ID " + entityId + " not found");
-            }
-        } catch (Exception e) {
-            if (tx != null && tx.isActive()) {
-                tx.rollback(); // Annulation de la transaction en cas d'erreur
-            }
-            throw e; // Propagation de l'exception
-        }
+    private List<Ticket> findTicketsByUser(User user) {
+        Query query = entityManager.createQuery("SELECT t FROM Ticket t WHERE t.createdBy = :user OR t.assignedTo = :user", Ticket.class);
+        query.setParameter("user", user);
+        return query.getResultList();
     }
+
+    private List<Comment> findCommentsByUser(User user) {
+        Query query = entityManager.createQuery("SELECT c FROM Comment c WHERE c.user = :user", Comment.class);
+        query.setParameter("user", user);
+        return query.getResultList();
+    }
+
+
 
     @Override
     public User findOne(String id) {
         return entityManager.find(User.class,id);
+    }
+
+    public User findByEmail(String email) {
+        try {
+            Query query = entityManager.createQuery("SELECT p FROM User p WHERE p.email = :email", User.class);
+            query.setParameter("email", email);
+            return (User) query.getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
+    }
+
+    public User findByUsername(String username) {
+        try {
+            Query query = entityManager.createQuery("SELECT p FROM User p WHERE p.username = :username", User.class);
+            query.setParameter("username", username);
+            return (User) query.getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
     }
 
     @Override

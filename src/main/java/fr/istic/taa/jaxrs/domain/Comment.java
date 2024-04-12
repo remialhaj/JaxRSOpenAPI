@@ -1,5 +1,6 @@
 package fr.istic.taa.jaxrs.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.xml.bind.annotation.*;
 
@@ -12,9 +13,12 @@ public class Comment {
     private Long id;
 
     @ManyToOne
-    private User createdBy;
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @ManyToOne
+    @JoinColumn(name = "ticket_id")
+    @JsonIgnore
     private Ticket ticket;
 
     private String content;
@@ -28,13 +32,12 @@ public class Comment {
         this.id = id;
     }
 
-    @XmlElement(name = "createdBy")
     public User getCreatedBy() {
-        return createdBy;
+        return user;
     }
 
-    public void setCreatedBy(User createdBy) {
-        this.createdBy = createdBy;
+    public void setCreatedBy(User user) {
+        this.user = user;
     }
 
     public Ticket getTicket() {

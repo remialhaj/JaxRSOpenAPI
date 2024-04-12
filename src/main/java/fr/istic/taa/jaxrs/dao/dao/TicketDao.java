@@ -86,6 +86,10 @@ public class TicketDao extends AbstractJpaDao<Ticket, String> {
         return entityManager.find(Ticket.class,id);
     }
 
+    public Ticket findOne(Long id) {
+        return entityManager.find(Ticket.class,id);
+    }
+
     @Override
     public List<Ticket> findAll() {
         Query query = entityManager.createQuery("SELECT p FROM Ticket p", Ticket.class);

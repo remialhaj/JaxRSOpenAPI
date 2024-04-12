@@ -2,10 +2,12 @@ package fr.istic.taa.jaxrs.domain;
 
 import jakarta.persistence.*;
 import jakarta.xml.bind.annotation.*;
-import java.util.*;
 
 @Entity
-@Table(name = "USER")
+@Table(name = "USER", uniqueConstraints = {
+        @UniqueConstraint(columnNames = "email"),
+        @UniqueConstraint(columnNames = "username")
+})
 @XmlRootElement(name = "User")
 public class User {
     @Id
@@ -15,8 +17,7 @@ public class User {
     private String username;
     private String email;
     private String password;
-    @OneToMany(mappedBy = "createdBy", cascade = CascadeType.ALL)
-    private List<Ticket> tickets = new ArrayList<>();
+
     @XmlElement(name = "id")
     public Long getId() {
         return id;
@@ -53,11 +54,4 @@ public class User {
         this.password = password;
     }
 
-    public List<Ticket> getTickets() {
-        return tickets;
-    }
-
-    public void setTickets(List<Ticket> tickets) {
-        this.tickets = tickets;
-    }
 }

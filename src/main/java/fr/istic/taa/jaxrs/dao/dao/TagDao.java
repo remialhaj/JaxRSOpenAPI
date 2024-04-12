@@ -91,4 +91,14 @@ public class TagDao extends AbstractJpaDao<Tag, String> {
         Query query = entityManager.createQuery("SELECT p FROM Tag p", Tag.class);
         return query.getResultList();
     }
+
+    public Tag findByName(String name) {
+        try {
+            Query query = entityManager.createQuery("SELECT p FROM Tag p WHERE p.name = :name", Tag.class);
+            query.setParameter("name", name);
+            return (Tag) query.getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
+    }
 }
