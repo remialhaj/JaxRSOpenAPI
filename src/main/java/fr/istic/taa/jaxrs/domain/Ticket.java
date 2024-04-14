@@ -6,9 +6,7 @@ import jakarta.xml.bind.annotation.*;
 import java.util.*;
 
 @Entity
-@Table(name = "TICKET", uniqueConstraints = {
-        @UniqueConstraint(columnNames = "title")
-})
+@Table(name = "TICKET")
 @XmlRootElement(name = "Ticket")
 public class Ticket {
     @Id

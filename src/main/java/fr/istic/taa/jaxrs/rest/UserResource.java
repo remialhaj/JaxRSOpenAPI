@@ -3,35 +3,60 @@ package fr.istic.taa.jaxrs.rest;
 import fr.istic.taa.jaxrs.dao.dao.*;
 import fr.istic.taa.jaxrs.domain.*;
 import jakarta.ws.rs.*;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.*;
 import java.util.*;
 
 @Path("user")
-@Produces({"application/json", "application/xml"})
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
 public class UserResource {
 
-    @GET
+    // Se connecter, supprimer, ajouter un USER
+    @POST
+    @Path("/login")
+    public Response loginUser(User user) {
+        UserDao userDao = new UserDao();
+        User existingUser = userDao.findByEmail(user.getEmail());
+
+        if (existingUser != null) {
+            if (existingUser.getPassword().equals(user.getPassword())) {
+                return Response.status(Response.Status.OK)
+                        .entity("{\"email\": \"" + existingUser.getEmail() + "\"}")
+                        .build();
+            } else {
+                return Response.status(Response.Status.UNAUTHORIZED)
+                        .entity("{\"error\": \"Invalid email or password\"}")
+                        .build();
+            }
+        } else {
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity("{\"error\": \"User with email " + user.getEmail() + " not found\"}")
+                    .build();
+        }
+
+
+    }
+
+    @DELETE
     @Path("/{userId}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public User getUserById(@PathParam("userId") String userId) {
+    public Response deleteUser(@PathParam("userId") String userId) {
         UserDao userDao = new UserDao();
-        return userDao.findOne(userId);
-    }
+        User userToDelete = userDao.findByEmail(userId);
 
-    @GET
-    @Path("/")
-    public List<User> getAllUsers() {
-        UserDao userDao = new UserDao();
-        return userDao.findAll();
+        if (userToDelete != null) {
+            userDao.delete(userToDelete);
+            return Response.status(Response.Status.OK)
+                    .entity("{\"message\": \"User with ID " + userId + " deleted successfully\"}")
+                    .build();
+        } else {
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity("{\"error\": \"User with ID " + userId + " not found\"}")
+                    .build();
+        }
     }
-
-    ////////////////////////////VALIDER LE REGISTER///////////////////////////
 
     @POST
     @Path("/register")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
     public Response addUser(User user) {
         UserDao userDao = new UserDao();
         User existingUser = userDao.findByEmail(user.getEmail());
@@ -53,48 +78,50 @@ public class UserResource {
         }
 
     }
-//////////////////////////////////////////////////////////////////////////
-    @PUT
-    @Path("/{userId}")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public User updateUser(@PathParam("userId") String userId, User updatedUser) {
-        UserDao userDao = new UserDao();
-        User existingUser = userDao.findOne(userId);
+////////////////////////////////////////////////////////////////////////////////////////////
 
-        if (existingUser != null) {
-            updatedUser.setId(Long.parseLong(userId)); // Assurez-vous que l'ID est correctement défini pour l'utilisateur mis à jour
-            userDao.update(updatedUser);
-            return updatedUser;
+
+   // Récupérer les tickets, les tickets avec commentaires, ajouter un ticket, ajouter un commentaire
+    @GET
+    @Path("/{userId}/tickets")
+    public List<Ticket> getTicketsForUser(@PathParam("userId") String userId) {
+        UserDao userDao = new UserDao();
+        User user = userDao.findByEmail(userId);
+
+        if (user != null) {
+            TicketDao ticketDao = new TicketDao();
+            return ticketDao.findTicketsCreatedByUser(user.getId());
+        }else {
+            throw new NotFoundException("User with ID " + userId + " not found");
+        }
+    }
+
+    @GET
+    @Path("/{userId}/ticketscomments")
+    public List<Ticket> getTicketsCreatedByUser(@PathParam("userId") String userId) {
+        UserDao userDao = new UserDao();
+        User user = userDao.findByEmail(userId);
+
+        if (user != null) {
+            TicketDao ticketDao = new TicketDao();
+            List<Ticket> ticketsCreatedByUser = ticketDao.findTicketsCreatedByUser(user.getId());
+            for (Ticket ticket : ticketsCreatedByUser) {
+                ticket.setComments(loadCommentsForTicket(ticket.getId()));
+            }
+
+            return ticketsCreatedByUser;
         } else {
             throw new NotFoundException("User with ID " + userId + " not found");
         }
     }
 
-    @DELETE
-    @Path("/{userId}")
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response deleteUser(@PathParam("userId") String userId) {
-        UserDao userDao = new UserDao();
-        User userToDelete = userDao.findByEmail(userId);
-
-        if (userToDelete != null) {
-            userDao.delete(userToDelete);
-            return Response.status(Response.Status.OK)
-                    .entity("{\"message\": \"User with ID " + userId + " deleted successfully\"}")
-                    .build();
-        } else {
-            return Response.status(Response.Status.NOT_FOUND)
-                    .entity("{\"error\": \"User with ID " + userId + " not found\"}")
-                    .build();
-        }
+    private List<Comment> loadCommentsForTicket(Long ticketId) {
+        CommentDao commentDao = new CommentDao();
+        return commentDao.findByTicketId(ticketId);
     }
 
     @POST
     @Path("/{userId}/tickets")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
     public Response createTicketForUser(@PathParam("userId") String userId, Ticket ticket) {
         UserDao userDao = new UserDao();
         User user = userDao.findByEmail(userId);
@@ -131,75 +158,8 @@ public class UserResource {
         }
     }
 
-    @GET
-    @Path("/{userId}/tickets")
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    public List<Ticket> getTicketsForUser(@PathParam("userId") String userId) {
-        UserDao userDao = new UserDao();
-        User user = userDao.findByEmail(userId);
-
-        if (user != null) {
-            TicketDao ticketDao = new TicketDao();
-            List<Ticket> ticketsForUser = ticketDao.findTicketsCreatedByUser(user.getId());
-            return ticketsForUser;
-        }else {
-            throw new NotFoundException("User with ID " + userId + " not found");
-        }
-    }
-
-
-    ////////////////////////////VALIDER LE GET TICKETS///////////////////////////
-    @GET
-    @Path("/{userId}/ticketscomments")
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    public List<Ticket> getTicketsCreatedByUser(@PathParam("userId") String userId) {
-        UserDao userDao = new UserDao();
-        User user = userDao.findByEmail(userId);
-
-        if (user != null) {
-            TicketDao ticketDao = new TicketDao();
-            List<Ticket> ticketsCreatedByUser = ticketDao.findTicketsCreatedByUser(user.getId());
-            for (Ticket ticket : ticketsCreatedByUser) {
-                ticket.setComments(loadCommentsForTicket(ticket.getId()));
-            }
-
-            return ticketsCreatedByUser;
-        } else {
-            throw new NotFoundException("User with ID " + userId + " not found");
-        }
-    }
-    // Méthode pour charger les commentaires associés à un ticket
-    private List<Comment> loadCommentsForTicket(Long ticketId) {
-        CommentDao commentDao = new CommentDao();
-        return commentDao.findByTicketId(ticketId);
-    }
-//////////////////////////////////////////////////////////////////////////
-    @POST
-    @Path("/tags")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response createTag(Tag tag) {
-        TagDao tagDao = new TagDao();
-        Tag existingTag = tagDao.findByName(tag.getName());
-
-        if (existingTag != null) {
-            return Response.status(Response.Status.CONFLICT)
-                    .entity("{\"error\": \"Tag with name " + tag.getName() + " already exists\"}")
-                    .build();
-        } else {
-            tagDao.save(tag);
-            return Response.status(Response.Status.CREATED)
-                    .entity("{\"message\": \"Tag created successfully\"}")
-                    .build();
-        }
-    }
-
     @POST
     @Path("/{userId}/tickets/{ticketId}/comments")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
     public Response addCommentToTicket(@PathParam("userId") String userEmail, @PathParam("ticketId") Long ticketId, Comment comment) {
         UserDao userDao = new UserDao();
         User user = userDao.findByEmail(userEmail);
@@ -238,36 +198,41 @@ public class UserResource {
                     .build();
         }
     }
+////////////////////////////////////////////////////////////////////////////////////////////
 
 
-    ////////////////////////////VALIDER LE LOGIN///////////////////////////
-    @POST
-    @Path("/login")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response loginUser(User user) {
+    // Récupérer les tags
+    @GET
+    @Path("/tags")
+    public List<Tag> getAllTags() {
+        TagDao tagDao = new TagDao();
+        return tagDao.findAll();
+    }
+
+////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    @GET
+    @Path("/{userId}")
+    public User getUserById(@PathParam("userId") String userId) {
         UserDao userDao = new UserDao();
-        User existingUser = userDao.findByEmail(user.getEmail());
+        return userDao.findOne(userId);
+    }
+
+    @PUT
+    @Path("/{userId}")
+    public User updateUser(@PathParam("userId") String userId, User updatedUser) {
+        UserDao userDao = new UserDao();
+        User existingUser = userDao.findOne(userId);
 
         if (existingUser != null) {
-            if (existingUser.getPassword().equals(user.getPassword())) {
-                return Response.status(Response.Status.OK)
-                        .entity("{\"email\": \"" + existingUser.getEmail() + "\"}")
-                        .build();
-            } else {
-                return Response.status(Response.Status.UNAUTHORIZED)
-                        .entity("{\"error\": \"Invalid email or password\"}")
-                        .build();
-            }
+            updatedUser.setId(Long.parseLong(userId)); // Assurez-vous que l'ID est correctement défini pour l'utilisateur mis à jour
+            userDao.update(updatedUser);
+            return updatedUser;
         } else {
-            return Response.status(Response.Status.NOT_FOUND)
-                    .entity("{\"error\": \"User with email " + user.getEmail() + " not found\"}")
-                    .build();
+            throw new NotFoundException("User with ID " + userId + " not found");
         }
-
-
     }
-//////////////////////////////////////////////////////////////////////////
 
     @DELETE
     @Path("/tickets/{ticketId}")
@@ -282,16 +247,5 @@ public class UserResource {
             throw new NotFoundException("Ticket with ID " + ticketId + " not found");
         }
     }
-
-    @GET
-    @Path("/tags")
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    public List<Tag> getAllTags() {
-        TagDao tagDao = new TagDao();
-        return tagDao.findAll();
-    }
-
-
 
 }

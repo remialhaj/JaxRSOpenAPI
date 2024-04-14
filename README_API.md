@@ -8,7 +8,7 @@ Suppression de USER (USER=>ticket=>comment) avec fonction deleteUser()
 
 Création de TICKET avec fonction createTicketForUser()
 Affichage de TICKET et ces commentaires avec fonction getTicketsCreatedByUser()
-
+Création de COMMENT avec fonction addCommentToTicket()
 
 Alimente le spinner Tag avec getAllTags()
 
@@ -29,5 +29,5 @@ Admin création de tag
 Ajout de Admin
 Suppression de Admin
 Page de connexion Admin
-Ajout de commentaire
+
 Suppression de ticket

@@ -2,6 +2,7 @@ package fr.istic.taa.jaxrs.dao.dao;
 
 import fr.istic.taa.jaxrs.dao.generic.*;
 import fr.istic.taa.jaxrs.domain.Admin;
+import fr.istic.taa.jaxrs.domain.User;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -91,4 +92,25 @@ public class AdminDao extends AbstractJpaDao<Admin, String> {
         Query query = entityManager.createQuery("SELECT p FROM Admin p", Admin.class);
         return query.getResultList();
     }
+
+    public Admin findByEmail(String email) {
+        try {
+            Query query = entityManager.createQuery("SELECT p FROM User p WHERE p.email = :email", Admin.class);
+            query.setParameter("email", email);
+            return (Admin) query.getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
+    }
+
+    public Admin findByUsername(String username) {
+        try {
+            Query query = entityManager.createQuery("SELECT p FROM User p WHERE p.username = :username", Admin.class);
+            query.setParameter("username", username);
+            return (Admin) query.getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
+    }
+
 }

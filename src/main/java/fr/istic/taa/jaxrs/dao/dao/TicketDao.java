@@ -102,5 +102,28 @@ public class TicketDao extends AbstractJpaDao<Ticket, String> {
         return query.getResultList();
     }
 
+    public List<Ticket> findTicketsAssignedToAdmin(Long userId) {
+        Query query = entityManager.createQuery("SELECT t FROM Ticket t WHERE t.assignedTo.id = :userId", Ticket.class);
+        query.setParameter("userId", userId);
+        return query.getResultList();
+    }
+
+    public void updateStatus(Long ticketId, boolean resolved) {
+        EntityTransaction tx = entityManager.getTransaction();
+        tx.begin(); // Début de la transaction
+
+        try {
+            Ticket ticket = findOne(ticketId);
+            ticket.setResolved(resolved);
+            entityManager.merge(ticket);
+            tx.commit(); // Validation de la transaction
+        } catch (Exception e) {
+            if (tx != null && tx.isActive()) {
+                tx.rollback(); // Annulation de la transaction en cas d'erreur
+            }
+            throw e; // Propagation de l'exception
+        }
+    }
+
 
 }
