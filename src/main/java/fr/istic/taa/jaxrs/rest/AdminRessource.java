@@ -3,11 +3,8 @@ package fr.istic.taa.jaxrs.rest;
 import fr.istic.taa.jaxrs.dao.dao.*;
 import fr.istic.taa.jaxrs.domain.*;
 import jakarta.ws.rs.*;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
-
-import java.util.Date;
-import java.util.List;
+import jakarta.ws.rs.core.*;
+import java.util.*;
 
 @Path("admin")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -17,9 +14,9 @@ public class AdminRessource {
     @POST
     @Path("/register")
     public Response addAdmin(Admin admin) {
-        AdminDao adminDao = new AdminDao();
-        Admin existingAdmin = adminDao.findByEmail(admin.getEmail());
-        Admin existingAdmin2 = adminDao.findByUsername(admin.getUsername());
+        UserDao adminDao = new UserDao();
+        User existingAdmin = adminDao.findByEmail(admin.getEmail());
+        User existingAdmin2 = adminDao.findByUsername(admin.getUsername());
 
         if (existingAdmin != null) {
             return Response.status(Response.Status.CONFLICT)
@@ -33,6 +30,29 @@ public class AdminRessource {
             adminDao.save(admin);
             return Response.status(Response.Status.CREATED)
                     .entity("{\"message\": \"Admin created successfully\"}")
+                    .build();
+        }
+    }
+
+    @POST
+    @Path("/login")
+    public Response loginAdmin(Admin admin) {
+        AdminDao adminDao = new AdminDao();
+        Admin existingAdmin = adminDao.findByEmail(admin.getEmail());
+
+        if (existingAdmin != null) {
+            if (existingAdmin.getPassword().equals(admin.getPassword())) {
+                return Response.status(Response.Status.OK)
+                        .entity("{\"email\": \"" + existingAdmin.getEmail() + "\"}")
+                        .build();
+            } else {
+                return Response.status(Response.Status.UNAUTHORIZED)
+                        .entity("{\"error\": \"Invalid email or password\"}")
+                        .build();
+            }
+        } else {
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity("{\"error\": \"User with email " + admin.getEmail() + " not found\"}")
                     .build();
         }
     }
@@ -60,14 +80,6 @@ public class AdminRessource {
                     .entity("{\"message\": \"Tag created successfully\"}")
                     .build();
         }
-    }
-
-
-    @GET
-    @Path("/allusers")
-    public List<User> getAllUsers() {
-        UserDao userDao = new UserDao();
-        return userDao.findAll();
     }
 
     @PUT
@@ -106,7 +118,6 @@ public class AdminRessource {
             for (Ticket ticket : ticketsAssignedToAdmin) {
                 ticket.setComments(loadCommentsForTicket(ticket.getId()));
             }
-
             return ticketsAssignedToAdmin;
         } else {
             throw new NotFoundException("User with ID " + userId + " not found");
@@ -140,7 +151,6 @@ public class AdminRessource {
                 newComment.setCreatedBy(admin);
                 newComment.setTicket(ticket);
                 newComment.setCreatedDate(new Date());
-
                 CommentDao commentDao = new CommentDao();
                 commentDao.save(newComment);
 
@@ -158,5 +168,14 @@ public class AdminRessource {
                     .build();
         }
     }
+
+/*
+    @GET
+    @Path("/allusers")
+    public List<User> getAllUsers() {
+        UserDao userDao = new UserDao();
+        return userDao.findAll();
+    }
+*/
 
 }

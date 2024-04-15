@@ -95,7 +95,7 @@ public class AdminDao extends AbstractJpaDao<Admin, String> {
 
     public Admin findByEmail(String email) {
         try {
-            Query query = entityManager.createQuery("SELECT p FROM User p WHERE p.email = :email", Admin.class);
+            Query query = entityManager.createQuery("SELECT p FROM Admin p WHERE p.email = :email", Admin.class);
             query.setParameter("email", email);
             return (Admin) query.getSingleResult();
         } catch (NoResultException e) {
@@ -105,7 +105,7 @@ public class AdminDao extends AbstractJpaDao<Admin, String> {
 
     public Admin findByUsername(String username) {
         try {
-            Query query = entityManager.createQuery("SELECT p FROM User p WHERE p.username = :username", Admin.class);
+            Query query = entityManager.createQuery("SELECT p FROM Admin p WHERE p.username = :username", Admin.class);
             query.setParameter("username", username);
             return (Admin) query.getSingleResult();
         } catch (NoResultException e) {

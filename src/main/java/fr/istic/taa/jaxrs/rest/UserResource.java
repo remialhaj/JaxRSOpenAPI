@@ -18,7 +18,7 @@ public class UserResource {
         UserDao userDao = new UserDao();
         User existingUser = userDao.findByEmail(user.getEmail());
 
-        if (existingUser != null) {
+        if (existingUser != null && existingUser.getClass().equals(User.class)) {
             if (existingUser.getPassword().equals(user.getPassword())) {
                 return Response.status(Response.Status.OK)
                         .entity("{\"email\": \"" + existingUser.getEmail() + "\"}")
@@ -211,7 +211,7 @@ public class UserResource {
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 
-
+/*
     @GET
     @Path("/{userId}")
     public User getUserById(@PathParam("userId") String userId) {
@@ -247,5 +247,5 @@ public class UserResource {
             throw new NotFoundException("Ticket with ID " + ticketId + " not found");
         }
     }
-
+*/
 }
