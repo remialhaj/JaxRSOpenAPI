@@ -19,9 +19,15 @@ public class AdminRessource {
         User existingAdmin2 = adminDao.findByUsername(admin.getUsername());
 
         if (existingAdmin != null) {
-            return Response.status(Response.Status.CONFLICT)
-                    .entity("{\"error\": \"Admin with email " + admin.getEmail() + " already exists\"}")
-                    .build();
+            if (existingAdmin.getClass().equals(Admin.class)){
+                return Response.status(Response.Status.CONFLICT)
+                        .entity("{\"error\": \"Admin with email " + admin.getEmail() + " already exists\"}")
+                        .build();
+            }else{
+                return Response.status(Response.Status.CONFLICT)
+                        .entity("{\"error\": \"This email " + admin.getEmail() + " belongs to a USER\"}")
+                        .build();
+            }
         }else if (existingAdmin2 != null) {
             return Response.status(Response.Status.CONFLICT)
                     .entity("{\"error\": \"Admin with username " + admin.getUsername() + " already exists\"}")
@@ -52,7 +58,7 @@ public class AdminRessource {
             }
         } else {
             return Response.status(Response.Status.NOT_FOUND)
-                    .entity("{\"error\": \"User with email " + admin.getEmail() + " not found\"}")
+                    .entity("{\"error\": \"Admin with email " + admin.getEmail() + " not found\"}")
                     .build();
         }
     }
@@ -102,7 +108,7 @@ public class AdminRessource {
             TicketDao ticketDao = new TicketDao();
             return ticketDao.findTicketsAssignedToAdmin(admin.getId());
         }else {
-            throw new NotFoundException("User with ID " + userId + " not found");
+            throw new NotFoundException("Admin with ID " + userId + " not found");
         }
     }
 
@@ -120,7 +126,7 @@ public class AdminRessource {
             }
             return ticketsAssignedToAdmin;
         } else {
-            throw new NotFoundException("User with ID " + userId + " not found");
+            throw new NotFoundException("Admin with ID " + userId + " not found");
         }
     }
 
@@ -164,7 +170,7 @@ public class AdminRessource {
             }
         } else {
             return Response.status(Response.Status.NOT_FOUND)
-                    .entity("{\"error\": \"User with email " + userEmail + " not found\"}")
+                    .entity("{\"error\": \"Admin with email " + userEmail + " not found\"}")
                     .build();
         }
     }
